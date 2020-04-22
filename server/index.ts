@@ -37,7 +37,7 @@ app.get("/*", (req, res) => {
 const server = app.listen(process.env.PORT || port, () => {
   const runningPort = server.address();
   // tslint:disable-next-line:no-console
-  console.log(`server started at ${runningPort}`);
+  console.log(`server started at ${process.env.PORT}`);
 });
 
 const mio = io(server);

@@ -4,7 +4,8 @@ import io from "socket.io-client";
 
 export function useSockets() {
   const { state, setRoom, setUserName, setPlayerList } = useStore();
-  const socket = io("localhost:4000");
+  const HOST = location.origin.replace(/^http/, "ws");
+  const socket = io(HOST);
 
   const joinSocketRoom = (roomName: string, userName: string) => {
     socket.emit(
