@@ -14,7 +14,7 @@ const publicPath = __dirname + "/";
 const staticConf = { maxAge: "1y", etag: false };
 app.use(express.static(publicPath, staticConf));
 
-const port = 4000;
+const port = 8080;
 
 interface Room {
   name: string;
@@ -34,9 +34,10 @@ app.get("/*", (req, res) => {
   res.sendFile(__dirname + "/index.html");
 });
 
-const server = app.listen(port, () => {
+const server = app.listen(process.env.PORT || port, () => {
+  const runningPort = server.address();
   // tslint:disable-next-line:no-console
-  console.log(`server started at http://localhost:${port}`);
+  console.log(`server started at ${runningPort}`);
 });
 
 const mio = io(server);
