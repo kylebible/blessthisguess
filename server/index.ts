@@ -133,7 +133,6 @@ mio.on("connection", (socket: io.Socket) => {
   socket.on("ASSIGN_PEOPLE", (roomName: string) => {
     const room = rooms[roomName];
     if (room) {
-      shuffle(room.playerList);
       assignPeople(room.playerList);
       mio.in(room.name).emit("PLAYER_CHANGE", room.playerList);
     }
@@ -152,18 +151,8 @@ function makeRoom(length: number) {
 
 function assignPeople(players: User[]): void {
   const copy = shuffle(players);
-  for (let i = players.length - 1; i >= 0; i--) {
-    // tslint:disable-next-line:no-console
-    console.log(copy);
-    for (let j = copy.length - 1; j >= 0; j--) {
-      if (copy[j].submittedName !== players[i].submittedName) {
-        players[i].assignedName = copy[j].submittedName;
-        // tslint:disable-next-line:no-console
-        console.log(players[i]);
-        copy.splice(j, 1);
-        break;
-      }
-    }
+  for (let i = 0; i <= copy.length - 1; i++) {
+    copy[i].assignedName = copy[(i + 1) % copy.length].submittedName;
   }
 }
 
