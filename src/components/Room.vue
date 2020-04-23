@@ -11,7 +11,8 @@
         label="Submit a Person"
         label-position="on-border"
       >
-        <b-input v-model="newSubmittedPerson"> </b-input>
+        <b-input :placeholder="personPlaceholder" v-model="newSubmittedPerson">
+        </b-input>
       </b-field>
       <b-button class="submit-button" type="is-primary" @click="submitPerson"
         >Submit</b-button
@@ -19,21 +20,32 @@
     </div>
     <div class="player-list">
       <h1>Who's Here?</h1>
-      <div v-for="player of players" :key="player.name">
-        <span>{{ player.name }}</span>
-        <span v-if="player.assignedName && player.name !== userName">{{
+      <div v-for="player of players" :key="player.name" class="player-item">
+        <b-icon
+          icon="star"
+          :style="{ visibility: player.isCreator ? 'visible' : 'hidden' }"
+        ></b-icon>
+        <span class="player-name">{{ player.name }}</span>
+        <span v-if="!player.submittedName" class="waiting"
+          >waiting to submit a name...</span
+        >
+        <b-icon
+          type="is-success"
+          icon="check"
+          v-else-if="player.submittedName && !player.assignedName"
+        ></b-icon>
+        <span v-else-if="player.assignedName && player.name !== userName">{{
           player.assignedName
         }}</span>
-        <b-icon icon="check" v-else-if="player.submittedName"></b-icon>
       </div>
       <b-button
-        v-if="isCreator"
-        :disabled="!isReadyToStart || !isCreator"
-        @click="startGame"
-        class="start-button"
+        v-if="isCreator && isReadyToAssign && players.length >= 2"
+        @click="assignPeople"
+        class="assign-button"
       >
-        Start the game!
+        Assign People!
       </b-button>
+      <span v-if="players.length === 1">Waiting on another player...</span>
     </div>
   </div>
 </template>
@@ -59,14 +71,24 @@ export default defineComponent({
     const userName = ref(state.user.name);
     const players = ref(state.playerList);
     const isCreator = ref(state.user.isCreator);
+    const examplePeople = ["Santa", "Queen Elizabeth", "Brad Pitt", "Batman"];
+    const personPlaceholder = ref("");
     const newSubmittedPerson = ref("");
     const {
       submitSocketPerson,
       leaveSocketRoom,
       assignSocketPeople,
     } = useSockets();
-    const isReadyToStart: Ref<boolean> = computed(() => {
+    const isReadyToAssign: Ref<boolean> = computed(() => {
       return players.value.every((player) => player.submittedName ?? false);
+    });
+
+    onMounted(() => {
+      let index = 0;
+      setInterval(() => {
+        personPlaceholder.value = examplePeople[index % examplePeople.length];
+        index++;
+      }, 2000);
     });
 
     watchEffect(() => {
@@ -92,7 +114,7 @@ export default defineComponent({
       leaveSocketRoom();
     };
 
-    const startGame = () => {
+    const assignPeople = () => {
       assignSocketPeople();
     };
 
@@ -102,10 +124,11 @@ export default defineComponent({
       players,
       newSubmittedPerson,
       submitPerson,
-      startGame,
+      assignPeople,
       leaveRoom,
-      isReadyToStart,
+      isReadyToAssign,
       isCreator,
+      personPlaceholder,
     };
   },
 });
@@ -115,6 +138,7 @@ export default defineComponent({
 .wrapper {
   position: relative;
   padding-top: 60px;
+  padding: 60px 30px 0 30px;
   width: 500px;
   height: 100vh;
   display: flex;
@@ -150,7 +174,7 @@ export default defineComponent({
 
 .submit-group {
   display: flex;
-  justify-content: center;
+  justify-content: flex-start;
   width: 90%;
   margin-top: 20px;
 }
@@ -163,10 +187,32 @@ h1 {
 }
 
 span {
-  font-size: 1.5em;
+  margin: 5px;
+  overflow: hidden;
+  white-space: nowrap;
 }
-.start-button {
+
+.player-name {
+  font-size: 1.5em;
+  width: 50%;
+}
+
+.waiting {
+  font-size: 1em;
+  opacity: 0.5;
+  width: 50%;
+}
+.assign-button {
   width: 50%;
   align-self: center;
+  margin-top: 20px;
+}
+.player-item {
+  height: 40px;
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-start;
+  align-items: center;
+  border-bottom: 1px solid lighten(gray, 20%);
 }
 </style>

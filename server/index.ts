@@ -70,43 +70,26 @@ mio.on("connection", (socket: io.Socket) => {
           resolve("", [], "Duplicate Player Name");
         }
       } else {
-        let roomName = data.roomName;
-        if (roomName === "") {
-          roomName = makeRoom(4);
-          // regenerates room name if already exists
-          while (rooms[roomName]) {
+        if (!data.isNew) {
+          resolve("", [], "Room Does Not Exist");
+        } else {
+          let roomName = data.roomName;
+          if (roomName === "") {
             roomName = makeRoom(4);
+            // regenerates room name if already exists
+            while (rooms[roomName]) {
+              roomName = makeRoom(4);
+            }
           }
+          socket.join(roomName);
+          const newRoom = {
+            name: roomName,
+            playerList: [{ name: data.userName, isCreator: true }],
+          };
+          rooms[roomName] = newRoom;
+          resolve(newRoom.name, newRoom.playerList, "");
         }
-        socket.join(roomName);
-        const newRoom = {
-          name: roomName,
-          playerList: [{ name: data.userName, isCreator: true }],
-        };
-        rooms[roomName] = newRoom;
-        resolve(newRoom.name, newRoom.playerList, "");
       }
-    }
-  );
-
-  socket.on(
-    "CREATE_ROOM",
-    (
-      userName: string,
-      resolveRoom: (roomName: string, allPlayers: User[]) => void
-    ) => {
-      let roomName = makeRoom(4);
-      // regenerates room name if already exists
-      while (rooms[roomName]) {
-        roomName = makeRoom(4);
-      }
-      socket.join(roomName);
-      const newRoom = {
-        name: roomName,
-        playerList: [{ name: userName, isCreator: true }],
-      };
-      rooms[roomName] = newRoom;
-      resolveRoom(roomName, newRoom.playerList);
     }
   );
 

@@ -2,11 +2,11 @@
   <div class="welcome-wrapper">
     <b-field
       :type="isRoomValid ? '' : 'is-danger'"
-      :message="isRoomValid ? '' : 'That room name is taken...'"
+      :message="isRoomValid ? '' : roomError"
       label="Room Name"
       label-position="on-border"
     >
-      <b-input v-model="roomName"> </b-input>
+      <b-input v-model="roomName" maxlength="30"> </b-input>
     </b-field>
     <b-field
       :type="isNameValid ? '' : 'is-danger'"
@@ -14,7 +14,7 @@
       label="Your Name"
       label-position="on-border"
     >
-      <b-input v-model="userName"></b-input>
+      <b-input v-model="userName" maxlength="12"></b-input>
     </b-field>
     <div class="welcome-buttons">
       <b-button type="is-primary" @click="createRoom" v-show="userName !== ''">
@@ -48,6 +48,7 @@ export default defineComponent({
     } = useStore();
     const roomName = ref("");
     const isRoomValid = ref(true);
+    const roomError = ref("");
     const isNameValid = ref(true);
     const userName = ref(state.user.name);
     const canSubmit: Ref<boolean> = computed(() => {
@@ -60,6 +61,7 @@ export default defineComponent({
       setIsCreator(true);
       joinSocketRoom(roomName.value, userName.value, true)
         .then(({ room, allPlayers }) => {
+          isNameValid.value = true;
           isRoomValid.value = true;
           setRoom(room);
           setPlayerList(allPlayers);
@@ -67,6 +69,7 @@ export default defineComponent({
         .catch((error) => {
           if (error === "Duplicate Room Name") {
             isRoomValid.value = false;
+            roomError.value = "That room name is taken";
           }
         });
     }
@@ -77,13 +80,16 @@ export default defineComponent({
       joinSocketRoom(roomName.value, userName.value, false)
         .then(({ room, allPlayers }) => {
           isNameValid.value = true;
+          isRoomValid.value = true;
           setRoom(room);
           setPlayerList(allPlayers);
         })
         .catch((error) => {
-          console.log(error);
           if (error === "Duplicate Player Name") {
             isNameValid.value = false;
+          } else if (error === "Room Does Not Exist") {
+            isRoomValid.value = false;
+            roomError.value = "That room hasn't been created yet";
           }
         });
     }
@@ -95,6 +101,7 @@ export default defineComponent({
     return {
       roomName,
       isRoomValid,
+      roomError,
       userName,
       isNameValid,
       createRoom,
