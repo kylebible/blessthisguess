@@ -93,6 +93,22 @@ mio.on("connection", (socket: io.Socket) => {
     }
   );
 
+  socket.on(
+    "REFRESH_CONNECTION",
+    (
+      roomName: string,
+      resolve: (allPlayers: User[], error: string) => void
+    ) => {
+      const room = rooms[roomName];
+      if (room) {
+        socket.join(roomName);
+        resolve(room.playerList, "");
+      } else {
+        resolve([], "Room does not exist");
+      }
+    }
+  );
+
   socket.on("LEAVE_ROOM", (data: { userName: string; roomName: string }) => {
     if (rooms[data.roomName]) {
       const room = rooms[data.roomName];

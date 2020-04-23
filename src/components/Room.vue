@@ -66,7 +66,7 @@ import { useStore } from "@/features/store";
 
 export default defineComponent({
   setup(props, context: SetupContext) {
-    const { state } = useStore();
+    const { state, setPlayerList } = useStore();
     const roomName = ref(state.room);
     const userName = ref(state.user.name);
     const players = ref(state.playerList);
@@ -78,6 +78,7 @@ export default defineComponent({
       submitSocketPerson,
       leaveSocketRoom,
       assignSocketPeople,
+      refreshConnection,
     } = useSockets();
     const isReadyToAssign: Ref<boolean> = computed(() => {
       return players.value.every((player) => player.submittedName ?? false);
@@ -85,6 +86,13 @@ export default defineComponent({
 
     onMounted(() => {
       let index = 0;
+      refreshConnection()
+        .then((allPlayers) => {
+          setPlayerList(allPlayers);
+        })
+        .catch((err) => {
+          leaveSocketRoom();
+        });
       setInterval(() => {
         personPlaceholder.value = examplePeople[index % examplePeople.length];
         index++;

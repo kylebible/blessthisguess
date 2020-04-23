@@ -27,6 +27,21 @@ export function useSockets() {
     });
   };
 
+  const refreshConnection = (): Promise<User[]> => {
+    return new Promise((resolve, reject) => {
+      socket.emit(
+        "REFRESH_CONNECTION",
+        state.room,
+        (allPlayers: User[], error: string) => {
+          if (error) {
+            reject(error);
+          }
+          resolve(allPlayers);
+        }
+      );
+    });
+  };
+
   const leaveSocketRoom = () => {
     socket.emit("LEAVE_ROOM", {
       userName: state.user.name,
@@ -35,10 +50,6 @@ export function useSockets() {
     setPlayerList([]);
     setRoom("");
   };
-
-  socket.on("PLAYER_CHANGE", (allPlayers: User[]) => {
-    setPlayerList(allPlayers);
-  });
 
   const submitSocketPerson = (person: string) => {
     socket.emit("SUBMIT_PERSON", {
@@ -52,11 +63,16 @@ export function useSockets() {
     socket.emit("ASSIGN_PEOPLE", state.room);
   };
 
+  socket.on("PLAYER_CHANGE", (allPlayers: User[]) => {
+    setPlayerList(allPlayers);
+  });
+
   return {
     joinSocketRoom,
     leaveSocketRoom,
     submitSocketPerson,
     assignSocketPeople,
+    refreshConnection,
     socket,
   };
 }
