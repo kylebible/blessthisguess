@@ -5,6 +5,7 @@
       :message="isRoomValid ? '' : roomError"
       label="Room Name"
       label-position="on-border"
+      v-if="!isRoomInRoute"
     >
       <b-input v-model="roomName" maxlength="30"></b-input>
     </b-field>
@@ -17,7 +18,11 @@
       <b-input v-model="userName" maxlength="12"></b-input>
     </b-field>
     <div class="welcome-buttons">
-      <b-button type="is-primary" @click="createRoom" v-show="userName !== ''">Start a Game</b-button>
+      <b-button
+        type="is-primary"
+        @click="createRoom"
+        v-show="userName !== '' && !isRoomInRoute"
+      >Start a Game</b-button>
       <b-button @click="joinRoom" v-show="canSubmit">Join a Game</b-button>
     </div>
   </div>
@@ -45,6 +50,7 @@ export default defineComponent({
       state
     } = useStore();
     const roomName = ref("");
+    const isRoomInRoute = ref(context.root.$route.params.roomName);
     const isRoomValid = ref(true);
     const roomError = ref("");
     const isNameValid = ref(true);
@@ -111,7 +117,8 @@ export default defineComponent({
       createRoom,
       joinRoom,
       canSubmit,
-      upperCaseRoom
+      upperCaseRoom,
+      isRoomInRoute
     };
   }
 });
