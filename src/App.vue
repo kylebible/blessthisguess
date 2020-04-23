@@ -11,7 +11,7 @@ import {
   SetupContext,
   onMounted,
   ref,
-  computed,
+  computed
 } from "@vue/composition-api";
 import Welcome from "@/components/Welcome.vue";
 import Room from "@/components/Room.vue";
@@ -26,7 +26,7 @@ export default defineComponent({
     });
 
     return { hasRoom };
-  },
+  }
 });
 </script>
 

@@ -1,15 +1,16 @@
 import App from "@/App.vue";
 import Vue from "vue";
-import Router from "vue-router";
+import VueRouter from "vue-router";
 
-Vue.use(Router);
+Vue.use(VueRouter);
 
-export default new Router({
+export default new VueRouter({
   routes: [
     {
       path: "/",
       name: "App",
       component: App,
     },
+    { path: "/:roomName", name: "rooms", component: App },
   ],
 });

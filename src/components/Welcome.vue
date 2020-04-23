@@ -6,7 +6,7 @@
       label="Room Name"
       label-position="on-border"
     >
-      <b-input v-model="roomName" maxlength="30"> </b-input>
+      <b-input v-model="roomName" maxlength="30"></b-input>
     </b-field>
     <b-field
       :type="isNameValid ? '' : 'is-danger'"
@@ -17,9 +17,7 @@
       <b-input v-model="userName" maxlength="12"></b-input>
     </b-field>
     <div class="welcome-buttons">
-      <b-button type="is-primary" @click="createRoom" v-show="userName !== ''">
-        Start a Game
-      </b-button>
+      <b-button type="is-primary" @click="createRoom" v-show="userName !== ''">Start a Game</b-button>
       <b-button @click="joinRoom" v-show="canSubmit">Join a Game</b-button>
     </div>
   </div>
@@ -32,7 +30,7 @@ import {
   onMounted,
   ref,
   computed,
-  Ref,
+  Ref
 } from "@vue/composition-api";
 import { useSockets } from "@/services/sockets";
 import { useStore } from "@/features/store";
@@ -44,7 +42,7 @@ export default defineComponent({
       setIsCreator,
       setRoom,
       setPlayerList,
-      state,
+      state
     } = useStore();
     const roomName = ref("");
     const isRoomValid = ref(true);
@@ -56,6 +54,12 @@ export default defineComponent({
     });
     const { joinSocketRoom } = useSockets();
 
+    onMounted(() => {
+      if (context.root.$route.params.roomName) {
+        roomName.value = context.root.$route.params.roomName;
+      }
+    });
+
     function createRoom() {
       setUserName(userName.value);
       setIsCreator(true);
@@ -66,7 +70,7 @@ export default defineComponent({
           setRoom(room);
           setPlayerList(allPlayers);
         })
-        .catch((error) => {
+        .catch(error => {
           if (error === "Duplicate Room Name") {
             isRoomValid.value = false;
             roomError.value = "That room name is taken";
@@ -84,7 +88,7 @@ export default defineComponent({
           setRoom(room);
           setPlayerList(allPlayers);
         })
-        .catch((error) => {
+        .catch(error => {
           if (error === "Duplicate Player Name") {
             isNameValid.value = false;
           } else if (error === "Room Does Not Exist") {
@@ -107,9 +111,9 @@ export default defineComponent({
       createRoom,
       joinRoom,
       canSubmit,
-      upperCaseRoom,
+      upperCaseRoom
     };
-  },
+  }
 });
 </script>
 

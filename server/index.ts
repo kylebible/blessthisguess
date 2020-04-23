@@ -37,7 +37,7 @@ interface Question {
 
 const rooms: { [key: string]: Room } = {};
 
-app.get("/*", (req, res) => {
+app.get("/.*/", (req, res) => {
   res.sendFile(__dirname + "/index.html");
 });
 
