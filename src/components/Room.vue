@@ -18,7 +18,7 @@
       >
     </div>
     <div class="player-list">
-      <h1>Players</h1>
+      <h1>Who's Here?</h1>
       <div v-for="player of players" :key="player.name">
         <span>{{ player.name }}</span>
         <span v-if="player.assignedName && player.name !== userName">{{
@@ -28,10 +28,11 @@
       </div>
       <b-button
         v-if="isCreator"
-        :disabled="!isReadyToAssign || !isCreator"
-        @click="assignPeople"
+        :disabled="!isReadyToStart || !isCreator"
+        @click="startGame"
+        class="start-button"
       >
-        Assign Roles
+        Start the game!
       </b-button>
     </div>
   </div>
@@ -64,7 +65,7 @@ export default defineComponent({
       leaveSocketRoom,
       assignSocketPeople,
     } = useSockets();
-    const isReadyToAssign: Ref<boolean> = computed(() => {
+    const isReadyToStart: Ref<boolean> = computed(() => {
       return players.value.every((player) => player.submittedName ?? false);
     });
 
@@ -91,7 +92,7 @@ export default defineComponent({
       leaveSocketRoom();
     };
 
-    const assignPeople = () => {
+    const startGame = () => {
       assignSocketPeople();
     };
 
@@ -101,9 +102,9 @@ export default defineComponent({
       players,
       newSubmittedPerson,
       submitPerson,
-      assignPeople,
+      startGame,
       leaveRoom,
-      isReadyToAssign,
+      isReadyToStart,
       isCreator,
     };
   },
@@ -163,5 +164,9 @@ h1 {
 
 span {
   font-size: 1.5em;
+}
+.start-button {
+  width: 50%;
+  align-self: center;
 }
 </style>

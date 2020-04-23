@@ -6,13 +6,14 @@
   "scripts": {
     "serve-fe": "vue-cli-service serve",
     "build-fe": "vue-cli-service build",
-    "build-fe-dev": "vue-cli-service build --watch",
+    "dev": "vue-cli-service build --watch",
     "lint": "vue-cli-service lint",
     "build-server": "tsc --project tsconfig.server.json",
     "prestart": "npm run build-server & npm run build-fe",
     "start": "node .",
-    "prestart-dev": "npm run build-server & npm run build-fe-dev",
+    "prestart-dev": "npm run build-server",
     "start-dev": "node .",
+    "start-dev:watch": "nodemon",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "dependencies": {
@@ -43,10 +44,12 @@
     "express": "^4.17.1",
     "morgan": "^1.10.0",
     "node-sass": "^4.12.0",
+    "nodemon": "^2.0.3",
     "prettier": "^1.19.1",
     "sass-loader": "^8.0.2",
     "socket.io": "^2.3.0",
     "socket.io-client": "^2.3.0",
+    "ts-node": "^8.9.0",
     "tslint": "^6.1.1",
     "typescript": "~3.8.3",
     "vue": "^2.6.11",
@@ -72,6 +75,19 @@
       "ecmaVersion": 2020
     },
     "rules": {}
+  },
+  "nodemonConfig": {
+    "ignore": [
+      "**/*.test.ts",
+      "**/*.spec.ts",
+      ".git",
+      "node_modules"
+    ],
+    "watch": [
+      "server"
+    ],
+    "exec": "npm run start-dev",
+    "ext": "ts"
   },
   "browserslist": [
     "> 1%",

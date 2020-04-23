@@ -28,6 +28,11 @@ interface User {
   isCreator: boolean;
 }
 
+interface Question {
+  question: string;
+  answers: boolean[];
+}
+
 const rooms: { [key: string]: Room } = {};
 
 app.get("/*", (req, res) => {
@@ -46,21 +51,41 @@ mio.on("connection", (socket: io.Socket) => {
   socket.on(
     "JOIN_ROOM",
     (
-      data: { roomName: string; userName: string },
-      resolve: (success: boolean, allPlayers: User[], error: string) => void
+      data: { roomName: string; userName: string; isNew: true },
+      resolve: (roomName: string, allPlayers: User[], error: string) => void
     ) => {
       const room = rooms[data.roomName];
       // tslint:disable-next-line:no-console
       if (room) {
-        if (room.playerList.findIndex((p) => p.name === data.userName) < 0) {
+        if (data.isNew) {
+          resolve("", [], "Duplicate Room Name");
+        } else if (
+          room.playerList.findIndex((p) => p.name === data.userName) < 0
+        ) {
           socket.join(room.name);
           room.playerList.push({ name: data.userName, isCreator: false });
           socket.to(room.name).emit("PLAYER_CHANGE", room.playerList);
-          resolve(true, room.playerList, "");
+          resolve(room.name, room.playerList, "");
+        } else {
+          resolve("", [], "Duplicate Player Name");
         }
-        resolve(false, [], "Duplicate Player Name");
+      } else {
+        let roomName = data.roomName;
+        if (roomName === "") {
+          roomName = makeRoom(4);
+          // regenerates room name if already exists
+          while (rooms[roomName]) {
+            roomName = makeRoom(4);
+          }
+        }
+        socket.join(roomName);
+        const newRoom = {
+          name: roomName,
+          playerList: [{ name: data.userName, isCreator: true }],
+        };
+        rooms[roomName] = newRoom;
+        resolve(newRoom.name, newRoom.playerList, "");
       }
-      resolve(false, [], "Room Does Not Exist");
     }
   );
 

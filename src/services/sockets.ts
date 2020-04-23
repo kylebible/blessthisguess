@@ -7,31 +7,24 @@ export function useSockets() {
   const HOST = location.origin.replace(/^http/, "ws");
   const socket = io(HOST);
 
-  const joinSocketRoom = (roomName: string, userName: string) => {
-    socket.emit(
-      "JOIN_ROOM",
-      { roomName: roomName.toUpperCase(), userName },
-      (success: boolean, allPlayers: User[], error: string) => {
-        if (success) {
-          setRoom(roomName);
-          setPlayerList(allPlayers);
-        } else {
-          // send validation feedback at some point
-          //   console.error(error);
+  const joinSocketRoom = (
+    roomName: string,
+    userName: string,
+    isNew: boolean
+  ): Promise<{ room: string; allPlayers: User[] }> => {
+    return new Promise((resolve, reject) => {
+      socket.emit(
+        "JOIN_ROOM",
+        { roomName: roomName.toUpperCase(), userName, isNew },
+        (room: string, allPlayers: User[], error: string) => {
+          if (error) {
+            reject(error);
+          } else {
+            resolve({ room, allPlayers });
+          }
         }
-      }
-    );
-  };
-
-  const createSocketRoom = (userName: string) => {
-    socket.emit(
-      "CREATE_ROOM",
-      userName,
-      (roomName: string, allPlayers: User[]) => {
-        setRoom(roomName);
-        setPlayerList(allPlayers);
-      }
-    );
+      );
+    });
   };
 
   const leaveSocketRoom = () => {
@@ -61,7 +54,6 @@ export function useSockets() {
 
   return {
     joinSocketRoom,
-    createSocketRoom,
     leaveSocketRoom,
     submitSocketPerson,
     assignSocketPeople,
