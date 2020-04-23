@@ -1,11 +1,22 @@
 <template>
-  <div>
-    <button @click="createRoom" :disabled="userName == ''">
-      Create Room
-    </button>
-    <input type="text" v-model="roomName" maxlength="4" required />
-    <input type="text" v-model="userName" required />
-    <button @click="joinRoom" :disabled="!canSubmit">Join Room</button>
+  <div class="welcome-wrapper">
+    <b-field label="Room Name" label-position="on-border">
+      <b-input v-model="roomName" maxlength="4" @input="upperCaseRoom">
+      </b-input>
+    </b-field>
+    <b-field label="Your Name" label-position="on-border">
+      <b-input v-model="userName"></b-input>
+    </b-field>
+    <div class="welcome-buttons">
+      <b-button
+        type="is-primary"
+        @click="createRoom"
+        :disabled="userName == ''"
+      >
+        Create Room
+      </b-button>
+      <b-button @click="joinRoom" :disabled="!canSubmit">Join Room</b-button>
+    </div>
   </div>
 </template>
 
@@ -43,9 +54,30 @@ export default defineComponent({
       joinSocketRoom(roomName.value, userName.value);
     }
 
-    return { roomName, userName, createRoom, joinRoom, canSubmit };
+    function upperCaseRoom() {
+      roomName.value = roomName.value.toUpperCase();
+    }
+
+    return {
+      roomName,
+      userName,
+      createRoom,
+      joinRoom,
+      canSubmit,
+      upperCaseRoom,
+    };
   },
 });
 </script>
 
-<style lang="scss"></style>
+<style lang="scss">
+.welcome-wrapper {
+  margin-top: 60px;
+  width: 300px;
+}
+.welcome-buttons {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-around;
+}
+</style>

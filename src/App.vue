@@ -11,7 +11,7 @@ import {
   SetupContext,
   onMounted,
   ref,
-  computed
+  computed,
 } from "@vue/composition-api";
 import Welcome from "@/components/Welcome.vue";
 import Room from "@/components/Room.vue";
@@ -26,7 +26,7 @@ export default defineComponent({
     });
 
     return { hasRoom };
-  }
+  },
 });
 </script>
 
@@ -35,8 +35,9 @@ export default defineComponent({
   font-family: Avenir, Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  text-align: center;
   color: #2c3e50;
-  margin-top: 60px;
+  display: flex;
+  justify-content: center;
+  font-size: 12px;
 }
 </style>

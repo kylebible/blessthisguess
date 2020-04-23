@@ -1,10 +1,22 @@
 <template>
-  <div>
-    <button @click="leaveRoom">Leave Room</button>
-    <div>Room Name: {{ roomName }}</div>
-    <div>UserName: {{ userName }}</div>
-    <input type="text" v-model="newSubmittedPerson" />
-    <button @click="submitPerson">Submit</button>
+  <div class="wrapper">
+    <b-button type="is-danger" class="leave-room" @click="leaveRoom"
+      >Leave Room</b-button
+    >
+    <div class="room-name">Room Name: {{ roomName }}</div>
+    <div class="user-name">UserName: {{ userName }}</div>
+    <div class="submit-group">
+      <b-field
+        class="person"
+        label="Submit a Person"
+        label-position="on-border"
+      >
+        <b-input v-model="newSubmittedPerson"> </b-input>
+      </b-field>
+      <b-button class="submit-button" type="is-primary" @click="submitPerson"
+        >Submit</b-button
+      >
+    </div>
     <div class="player-list">
       <h1>Players</h1>
       <div v-for="player of players" :key="player.name">
@@ -12,12 +24,16 @@
         <span v-if="player.assignedName && player.name !== userName">{{
           player.assignedName
         }}</span>
-        <span v-else-if="player.submittedName">x</span>
+        <b-icon icon="check" v-else-if="player.submittedName"></b-icon>
       </div>
+      <b-button
+        v-if="isCreator"
+        :disabled="!isReadyToAssign || !isCreator"
+        @click="assignPeople"
+      >
+        Assign Roles
+      </b-button>
     </div>
-    <button :disabled="!isReadyToAssign || !isCreator" @click="assignPeople">
-      Assign
-    </button>
   </div>
 </template>
 
@@ -54,7 +70,16 @@ export default defineComponent({
 
     watchEffect(() => {
       players.value = state.playerList;
+    });
+    watchEffect(() => {
       isCreator.value = state.user.isCreator;
+    });
+
+    watchEffect(() => {
+      roomName.value = state.room;
+    });
+    watchEffect(() => {
+      userName.value = state.user.name;
     });
 
     const submitPerson = () => {
@@ -85,9 +110,58 @@ export default defineComponent({
 });
 </script>
 
-<style lang="scss">
+<style scoped lang="scss">
+.wrapper {
+  position: relative;
+  padding-top: 60px;
+  width: 500px;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
 .player-list {
   display: flex;
   flex-direction: column;
+  width: 90%;
+}
+.room-name {
+  position: absolute;
+  top: 2em;
+  right: 1em;
+}
+
+.user-name {
+  position: absolute;
+  top: 2em;
+  left: 1em;
+}
+.leave-room {
+  position: absolute !important;
+  bottom: 10px;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.person {
+  width: 50%;
+}
+
+.submit-group {
+  display: flex;
+  justify-content: center;
+  width: 90%;
+  margin-top: 20px;
+}
+.submit-button {
+  margin-left: 10px;
+}
+
+h1 {
+  font-size: 2em;
+}
+
+span {
+  font-size: 1.5em;
 }
 </style>
