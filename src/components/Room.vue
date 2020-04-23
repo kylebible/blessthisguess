@@ -140,7 +140,7 @@ export default defineComponent({
   padding-top: 60px;
   padding: 60px 30px 0 30px;
   width: 500px;
-  height: 100vh;
+  height: 80vh;
   display: flex;
   flex-direction: column;
   align-items: center;
