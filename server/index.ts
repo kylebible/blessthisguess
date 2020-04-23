@@ -3,12 +3,14 @@ import cors from "cors";
 import bodyParser from "body-parser";
 import morgan from "morgan";
 import io from "socket.io";
+import sslRedirect from "heroku-ssl-redirect";
 
 const app = express();
 
 app.use(morgan("tiny"));
 app.use(cors());
 app.use(bodyParser.json());
+app.use(sslRedirect());
 
 const publicPath = __dirname + "/";
 const staticConf = { maxAge: "1y", etag: false };
