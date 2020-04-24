@@ -1,50 +1,36 @@
 <template>
   <div class="wrapper">
-    <b-button type="is-danger" class="leave-room" @click="leaveRoom"
-      >Leave Room</b-button
-    >
+    <b-button type="is-danger" class="leave-room" @click="leaveRoom">Leave Room</b-button>
     <div class="room-name">Room Name: {{ roomName }}</div>
     <div class="user-name">UserName: {{ userName }}</div>
     <div class="submit-group">
-      <b-field
-        class="person"
-        label="Submit a Person"
-        label-position="on-border"
-      >
-        <b-input :placeholder="personPlaceholder" v-model="newSubmittedPerson">
-        </b-input>
+      <b-field class="person" label="Submit a Person" label-position="on-border">
+        <b-input :placeholder="personPlaceholder" v-model="newSubmittedPerson"></b-input>
       </b-field>
-      <b-button class="submit-button" type="is-primary" @click="submitPerson"
-        >Submit</b-button
-      >
+      <b-button class="submit-button" type="is-primary" @click="submitPerson">Submit</b-button>
     </div>
     <div class="player-list">
       <h1>Who's Here?</h1>
       <div v-for="player of players" :key="player.name" class="player-item">
-        <b-icon
-          icon="star"
-          :style="{ visibility: player.isCreator ? 'visible' : 'hidden' }"
-        ></b-icon>
+        <b-icon icon="star" :style="{ visibility: player.isCreator ? 'visible' : 'hidden' }"></b-icon>
         <span class="player-name">{{ player.name }}</span>
-        <span v-if="!player.submittedName" class="waiting"
-          >waiting to submit a name...</span
-        >
+        <span v-if="!player.submittedName" class="waiting">waiting to submit a name...</span>
         <b-icon
           type="is-success"
           icon="check"
           v-else-if="player.submittedName && !player.assignedName"
         ></b-icon>
-        <span v-else-if="player.assignedName && player.name !== userName">{{
+        <span v-else-if="player.assignedName && player.name !== userName">
+          {{
           player.assignedName
-        }}</span>
+          }}
+        </span>
       </div>
       <b-button
         v-if="isCreator && isReadyToAssign && players.length >= 2"
         @click="assignPeople"
         class="assign-button"
-      >
-        Assign People!
-      </b-button>
+      >Assign People!</b-button>
       <span v-if="players.length === 1">Waiting on another player...</span>
     </div>
   </div>
@@ -59,10 +45,20 @@ import {
   computed,
   Ref,
   watch,
-  watchEffect,
+  watchEffect
 } from "@vue/composition-api";
 import { useSockets } from "@/services/sockets";
 import { useStore } from "@/features/store";
+import examplePeople from "@/data/examplePeople";
+
+const shuffle = (arr: any[]) => {
+  const copy = arr.slice(0);
+  for (let i = copy.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [copy[i], copy[j]] = [copy[j], copy[i]];
+  }
+  return copy;
+};
 
 export default defineComponent({
   setup(props, context: SetupContext) {
@@ -71,30 +67,33 @@ export default defineComponent({
     const userName = ref(state.user.name);
     const players = ref(state.playerList);
     const isCreator = ref(state.user.isCreator);
-    const examplePeople = ["Santa", "Queen Elizabeth", "Brad Pitt", "Batman"];
-    const personPlaceholder = ref("");
+    const peoplePlaceholders = shuffle(examplePeople);
+    const personPlaceholder = ref(
+      "Pick a famous person or fictional character!"
+    );
     const newSubmittedPerson = ref("");
     const {
       submitSocketPerson,
       leaveSocketRoom,
       assignSocketPeople,
-      refreshConnection,
+      refreshConnection
     } = useSockets();
     const isReadyToAssign: Ref<boolean> = computed(() => {
-      return players.value.every((player) => player.submittedName ?? false);
+      return players.value.every(player => player.submittedName ?? false);
     });
 
     onMounted(() => {
       let index = 0;
       refreshConnection()
-        .then((allPlayers) => {
+        .then(allPlayers => {
           setPlayerList(allPlayers);
         })
-        .catch((err) => {
+        .catch(err => {
           leaveSocketRoom();
         });
       setInterval(() => {
-        personPlaceholder.value = examplePeople[index % examplePeople.length];
+        personPlaceholder.value =
+          peoplePlaceholders[index % examplePeople.length];
         index++;
       }, 2000);
     });
@@ -136,9 +135,9 @@ export default defineComponent({
       leaveRoom,
       isReadyToAssign,
       isCreator,
-      personPlaceholder,
+      personPlaceholder
     };
-  },
+  }
 });
 </script>
 
